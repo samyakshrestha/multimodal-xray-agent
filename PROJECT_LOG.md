@@ -1,1 +1,3 @@
 - Downloaded CheXpert and ChestX-ray14 dataset 
+- Flattened the CheXpert dataset locally (had problems doing it on Colab because of I/O issues) and uploaded it to Drive
+- Preprocessed the CheXpert dataset and saved it to ./data/images_sample/chexpert

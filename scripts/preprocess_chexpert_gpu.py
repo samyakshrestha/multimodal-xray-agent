@@ -34,14 +34,16 @@ def preprocess_chexpert_gpu(in_dir, out_dir, max_workers=4):
     out_dir.mkdir(parents=True, exist_ok=True)
 
     all_paths = []
-    for root, _, files in os.walk(in_dir): # Walk through all subdirectories
+    for root, _, files in os.walk(in_dir):
         for f in files:
-            if f.lower().endswith(".jpg"): 
-                full_path = Path(root) / f 
-                rel_parts = full_path.relative_to(in_dir).parts
-                if len(rel_parts) >= 3: 
-                    patient, study, fname = rel_parts[-3:] # e.g., ['train', 'patient00001', 'study1', 'view1_frontal.jpg']
-                    out_name = f"{patient}_{study}_{fname}" 
+            if f.lower().endswith((".jpg", ".png")):
+                full_path = Path(root) / f
+                rel_path = full_path.relative_to(in_dir)
+                parts = rel_path.parts  # e.g., ['patient00001', 'study1', 'view1_frontal.jpg']
+                if len(parts) >= 3: # Ensure we have enough parts to extract patient and study
+                    patient, study, fname = parts[-3:] # Get last three parts
+                    out_name = f"{patient}_{study}_{fname}" # Construct output name
+                else:
                     out_name = f.name
                 out_path = out_dir / out_name
                 all_paths.append((full_path, out_path))

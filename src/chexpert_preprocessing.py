@@ -13,23 +13,22 @@ def _safe_mkdir(p: Path):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-def process_one(img_path: Path, out_dir: Path, transform, device="cpu"):
-    """
-    Preprocess a single X-ray image:
-    - Converts to grayscale
-    - Resizes and normalizes
-    - Saves as .png to out_dir
-    """
+    
+def process_one(img_path: Path):
     try:
-        img = Image.open(img_path).convert("L")                      # Convert to grayscale
-        tensor = transform(img).unsqueeze(0).to(device)              # Resize + send to device
-        arr = (tensor.squeeze().cpu().numpy() * 255).astype("uint8")  # Convert to uint8 image
+        # Load, convert to grayscale, apply transform, move to GPU
+        img = Image.open(img_path).convert("L")
+        tensor = transform(img).unsqueeze(0).to(device)
 
-        fname = img_path.stem + ".png"                               # Standardize filename
-        out_path = out_dir / fname
-        _safe_mkdir(out_path.parent)
-        Image.fromarray(arr).save(out_path, format="PNG")            # Save as PNG
+        # Convert back to uint8 NumPy array
+        arr = (tensor.squeeze().cpu().numpy() * 255).astype("uint8")
+
+        # Build .png filename (standardizing format)
+        fname = img_path.stem + ".png"  # Removes .jpg/.jpeg/etc., replaces with .png
+        out_path = OUT_DIR / fname
+
+        # Save as PNG
+        Image.fromarray(arr).save(out_path, format="PNG")
         return True
     except Exception as e:
         print(f"[ERROR] {img_path}: {e}")

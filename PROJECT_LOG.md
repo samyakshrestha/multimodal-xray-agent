@@ -7,3 +7,10 @@
 - Loaded BiomedCLIP (ViT-B/16) vision encoder and embedded ~350k images.
 - Normalized 512-D vectors and built FAISS index for cosine similarity search.
 - Saved image_faiss.bin and image_uuids.json to ./data/indexes/.
+
+- Sampled 30,000 abstracts from the `MedRAG/pubmed` dataset using Hugging Face Datasets API.
+- Exported full records to `raw_abstracts.jsonl` and minimal metadata (`pmid`, `title`) to `text_metadata.json`.
+- Loaded `allenai/specter2_base` sentence embedding model via `sentence-transformers`.
+- Embedded all title + abstract pairs (normalized 768-D float32 vectors).
+- Built cosine-similarity FAISS index (`IndexFlatIP`) and saved to `text_faiss.bin`.
+- Performed retrieval sanity checks with medical queries to verify embedding quality and recall.

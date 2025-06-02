@@ -14,3 +14,11 @@
 - Embedded all title + abstract pairs (normalized 768-D float32 vectors).
 - Built cosine-similarity FAISS index (`IndexFlatIP`) and saved to `text_faiss.bin`.
 - Performed retrieval sanity checks with medical queries to verify embedding quality and recall.
+
+- Loaded IU-Xray dataset from Hugging Face (`datasets.load_dataset("iu_xray")`).
+- Extracted impression sections from reports and saved to `iu_impr.jsonl` with canonical UUID format (`iu_XXXX`).
+- Parsed and resized 7,430 embedded DICOM PNGs from `.parquet` blobs, saving to `./data/iu_xray/images/`.
+- Verified and cataloged valid PNGs, assigning UUIDs and storing their paths in `iu_uuids.jsonl`.
+- Loaded BiomedCLIP (`microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224`) using OpenCLIP.
+- Applied vision transformer on all images using GPU-accelerated batch inference (`batch_size=32`).
+- Saved 512-D BiomedCLIP embeddings as `iu_vecs.npy` in `./data/iu_xray/`.

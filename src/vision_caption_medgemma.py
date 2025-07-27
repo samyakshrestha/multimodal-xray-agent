@@ -17,18 +17,26 @@ class MedGemmaTool(BaseTool):
     )
     args_schema: type = MedGemmaToolSchema
     
-    def __init__(self):
-        super().__init__()
-        print("Loading MedGemma-4B model... This may take a few minutes on first run.")
-        self.pipe = pipeline(
-            "image-text-to-text",
-            model="google/medgemma-4b-it",
-            torch_dtype=torch.bfloat16,
-            device="cuda" if torch.cuda.is_available() else "cpu",
-        )
-        print("MedGemma-4B model loaded successfully!")
+    # Class variable to store the pipeline (shared across instances)
+    _pipeline = None
+    
+    @classmethod
+    def get_pipeline(cls):
+        if cls._pipeline is None:
+            print("Loading MedGemma-4B model... This may take a few minutes on first run.")
+            cls._pipeline = pipeline(
+                "image-text-to-text",
+                model="google/medgemma-4b-it",
+                torch_dtype=torch.bfloat16,
+                device="cuda" if torch.cuda.is_available() else "cpu",
+            )
+            print("MedGemma-4B model loaded successfully!")
+        return cls._pipeline
 
     def _run(self, image_path: str, prompt: Optional[str] = None) -> str:
+        # Get the pipeline
+        pipe = self.get_pipeline()
+        
         # Use fallback prompt if none provided
         if prompt is None:
             prompt = (
@@ -59,7 +67,7 @@ class MedGemmaTool(BaseTool):
         except Exception as e:
             raise ValueError(f"Failed to load image {image_path}: {str(e)}")
 
-        # Create messages in MedGemma format
+        # Create messages in MedGemma format (no system prompt as requested)
         messages = [
             {
                 "role": "user",
@@ -72,7 +80,7 @@ class MedGemmaTool(BaseTool):
 
         # Generate response
         try:
-            output = self.pipe(text=messages, max_new_tokens=512)
+            output = pipe(text=messages, max_new_tokens=512)
             
             # Extract the generated text from MedGemma output format
             if isinstance(output, list) and len(output) > 0:

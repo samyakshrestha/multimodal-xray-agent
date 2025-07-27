@@ -27,21 +27,32 @@ class VisionCaptionTool(BaseTool):
         # Use fallback prompt if none provided
         if prompt is None:
             prompt = (
-                '''
-                Examine the chest X-ray step by step, following a structured A–G radiological workflow (Airway, Bones & soft tissues, Cardiac silhouette, Diaphragm, Lung fields, Pleura, and any Devices/foreign objects).
-                For each region, mentally assess both normal and abnormal findings before synthesizing them into a cohesive narrative report.
+                """Examine the chest X-ray step by step, following a structured A–G radiological workflow (Airway, Bones & soft tissues, Cardiac silhouette, Diaphragm, Lung fields, Pleura, and any Devices/foreign objects).  
+For each region, mentally assess both normal and abnormal findings, and ensure that every step is addressed, even if normal or limited by image quality. If a structure cannot be evaluated, state this explicitly.
 
-                When describing findings, always prefer specific visual observations over vague statements. 
-                If abnormal patterns are seen (e.g., opacities, effusion, pneumothorax), propose the most likely clinical significance in a cautious, professional tone, mirroring expert radiology style.
-                
-                Your final output must be formatted with two sections only:
-                Findings: Detailed observations based strictly on image evidence.
-                Impression: A concise, prioritized interpretation, integrating the key findings into a diagnostic hypothesis.
+All directional terms (LEFT/RIGHT) must refer strictly to the PATIENT’S perspective, and must be cross-referenced with radiographic markers (e.g., “L”, “R”) and expected anatomical landmarks when available.
 
-                Always explicitly comment on signs of chronic lung disease (emphysema, fibrosis, interstitial changes) if present or absent.
-                Avoid patient identifiers, clinical indication, comparison sections, or generic placeholders like ‘No acute findings.
-                The tone should be confident but never speculative beyond what the image supports.
-                '''
+When describing findings, always prefer specific visual observations over vague generalities.  
+If abnormal patterns are seen (e.g., opacities, effusion, pneumothorax, atelectasis, consolidation, interstitial thickening, volume loss), propose the most likely clinical significance in a professional and cautious tone, consistent with expert radiology language.  
+Weigh the clinical importance of each finding, and simulate a brief SECOND-PASS REVIEW of the image to verify that no significant abnormalities were overlooked.
+
+Describe all medical devices (e.g., endotracheal tube, central lines, pacemakers, chest tubes) with attention to:
+- PATIENT-side laterality
+- Entry site and course
+- Tip position
+- Placement appropriateness
+
+Your final output must be formatted with two sections only:
+
+FINDINGS:  
+Detailed, anatomically organized observations based strictly on image evidence. Always explicitly comment on signs of chronic lung disease (emphysema, fibrosis, interstitial changes) as either present or absent.
+
+IMPRESSION:  
+A concise, prioritized interpretation that integrates key findings into a diagnostic hypothesis.  
+Rank findings by CLINICAL SIGNIFICANCE, listing the most urgent or actionable abnormalities first. Use confident, direct language—but avoid speculation beyond what is visibly supported.
+
+Avoid patient identifiers, clinical indications, comparison sections, or generic placeholders like “no acute findings.”
+"""
             )
 
         # Determine MIME type
@@ -63,7 +74,7 @@ class VisionCaptionTool(BaseTool):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a world-renowned senior thoracic radiologist with over 20 years of clinical experience interpreting chest X-rays. You are meticulous, systematic, and articulate, blending sharp visual analysis with deep diagnostic reasoning."
+                    "content": "You are a world-renowned senior thoracic radiologist with over 20 years of clinical experience interpreting chest X-rays. You are meticulous, systematic, and articulate—blending sharp visual analysis with deep diagnostic reasoning. You never overlook subtle findings, always interpret anatomy from the patient’s perspective, and prioritize abnormalities by clinical urgency. Your reports are complete, precise, and modeled on the highest standards of radiologic practice."
                 },
                 {
                     "role": "user",

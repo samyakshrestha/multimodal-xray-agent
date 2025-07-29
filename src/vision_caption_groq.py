@@ -27,27 +27,15 @@ class VisionCaptionTool(BaseTool):
         # Use fallback prompt if none provided
         if prompt is None:
             prompt = (
-                """Examine the chest X-ray step by step, following a structured A–G radiological workflow (Airway & Mediastinum, Bones & soft tissues, Cardiac silhouette, Diaphragm, Lung fields, Pleura, any Devices/foreign objects, and “Global” sanity checks).  
-For each region, mentally assess both normal and abnormal findings before synthesizing them into a cohesive narrative report.
-
-All directional terms (LEFT/RIGHT) must refer strictly to the PATIENT’S perspective, and must be cross-referenced with radiographic markers (e.g., “L”, “R”) and expected anatomical landmarks when available.
-
-When describing findings, always prefer specific visual observations over vague generalities.  
-If abnormal patterns are seen (e.g., opacities, effusion, pneumothorax, atelectasis, consolidation, interstitial thickening), propose the most likely clinical significance in a professional and cautious tone, consistent with expert radiology language.  
-Weigh the clinical importance of each finding, and simulate a brief SECOND-PASS REVIEW of the image to verify that no significant abnormalities were overlooked.
-
+    """
+Examine the chest X-ray step by step, following a structured A–G radiological workflow (Airway & Mediastinum, Bones & soft tissues, Cardiac silhouette, Diaphragm, Lung fields, Pleura, any Devices/foreign objects, and “Global” sanity checks).For each region, mentally assess both normal and abnormal findings before synthesizing them into a cohesive narrative report.
+All directional terms (left/right) must refer strictly to the PATIENT’S perspective.
+When evaluating cardiac size on AP films, assume that mild to moderate enlargement may be projectional unless the heart silhouette is clearly disproportionate or supported by additional findings (e.g., pulmonary congestion).If abnormal patterns are seen (e.g., opacities, effusion, pneumothorax, atelectasis, consolidation), propose the most likely clinical significance in a professional and cautious tone, consistent with expert radiology language. Weigh the clinical importance of each finding, and simulate a brief SECOND-PASS REVIEW of the image to verify that no significant abnormalities were overlooked.
 Your final output must be formatted with two sections only:
-
-FINDINGS:  
-Structured prose following (but not explicitly labeling) the A–G sweep. Mention technical limitations only if they meaningfully impact interpretation. Always explicitly comment on signs of chronic lung disease (emphysema, fibrosis, interstitial changes) as either present or absent.
-
-IMPRESSION:  
-A concise, prioritized interpretation that integrates key findings into a diagnostic hypothesis.  
-Rank findings by CLINICAL SIGNIFICANCE, listing the most urgent or actionable abnormalities first. Remaining key diagnoses/differentials, each with a probability qualifier (“probable”, “possible”, etc.). Use confident, direct language—but avoid speculation beyond what is visibly supported.
-
-Avoid patient identifiers, clinical indications, comparison sections, or generic placeholders like “no acute findings.”
+FINDINGS:Structured prose following (but not explicitly labeling) the A–G sweep. Mention technical limitations only if they meaningfully impact interpretation. Always explicitly comment on signs of chronic lung disease (emphysema, fibrosis, interstitial changes) as either present or absent.
+IMPRESSION:A concise, prioritized interpretation that integrates key findings into a diagnostic hypothesis.Rank findings by CLINICAL SIGNIFICANCE, listing the most urgent or actionable abnormalities first. Remaining key diagnoses/differentials, each with a probability qualifier (“probable”, “possible”, etc.). Use confident, direct language—but avoid speculation beyond what is visibly supported.
 """
-            )
+)
 
         # Determine MIME type
         ext = os.path.splitext(image_path)[-1].lower()
@@ -68,7 +56,7 @@ Avoid patient identifiers, clinical indications, comparison sections, or generic
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a world-renowned senior thoracic radiologist with over 20 years of clinical experience interpreting chest X-rays. You are meticulous, systematic, and articulate—blending sharp visual analysis with deep diagnostic reasoning. You use internal scratchpads for reasoning, but only output the sections requested below."
+                    "content": "You are a board-certified thoracic radiologist with over 20 years of experience in interpreting chest X-rays. You are known for your meticulous attention to detail, clinical restraint, and deep respect for image-grounded reasoning. You prioritize accuracy over speculation and communicate with diagnostic clarity, always aligning your impressions with what is visibly demonstrable in the radiograph."
                 },
                 {
                     "role": "user",
@@ -78,6 +66,7 @@ Avoid patient identifiers, clinical indications, comparison sections, or generic
                     ]
                 }
             ],
+            temperature=0.2,
             model="meta-llama/llama-4-maverick-17b-128e-instruct"
         )
 

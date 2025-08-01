@@ -1,0 +1,24 @@
+caption_task:
+  description: "Analyze the chest X-ray at '{image_path}' and return the exact output from the vision_caption_tool"
+  expected_output: "The VERBATIM output of the vision_caption_tool"
+  agent: vision_agent
+
+pubmed_task:
+  description: "From the vision agent's report, extract ONLY the key POSITIVE finding(s) from the IMPRESSION section (ignore negations or normal findings). Use THOSE finding(s) as the input query to the pubmed_tool. Return the top 2 most relevant PubMed citations with pmid, similarity score, title, and abstract, along with the finding(s) that you used as an input for the pubmed_tool"
+  expected_output: "List of 2 relevant PubMed citations with pmid, similarity score, title, and abstract, along with the finding(s) used as input"
+  agent: pubmed_agent
+
+iu_task:
+  description: "Use the iu_tool to find the most similar impression in the IU-Xray dataset based on the X-ray image at '{image_path}'. Return the image UUID and the impression text of the closest match"
+  expected_output: "UUID and impression of the most semantically similar IU-Xray case"
+  agent: iu_agent
+
+draft_task:
+  description: "Your task is to write a two-part radiology report based on a chest X-ray image. Use the AI-generated visual caption [①] as your PRIMARY source of findings. You may also incorporate as SECONDARY sources: Language or structure from the closest IU-Xray impression [②], and medically relevant phrasing or terminology from PubMed abstracts [③]. However: NEVER contradict the visual caption. NEVER introduce information not clearly supported by one of the three sources. DO NOT speculate or offer clinical context not evident the caption. If findings are ambiguous or limited, hedge appropriately. Tag each sentence using [①], [②], or [③] to indicate which source supports it. Your report must have two sections: FINDINGS: Objective description of radiographic features [from ①] - Use [②] or [③] ONLY for language improvements or secondary detail. IMPRESSION: Concise summary of likely clinical implications based on the findings - You may re-use validated phrases from [②] or [③] ONLY if necessary, but DO NOT overreach"
+  expected_output: "A two-part radiology report with FINDINGS and IMPRESSION sections"
+  agent: draft_agent
+
+critic_task:
+  description: "Your task is to review and refine the draft radiology report (only the FINDINGS and IMPRESSIONS sections) for clinical accuracy, realism, and formatting. You MUST: Validate every sentence against its source tag: [①] = Caption, [②] = IU report, [③] = PubMed abstract. Remove any statement not clearly supported by the visual caption. Remove unsupported speculation, exaggerations, or redundant hedging. Maintain standard MIMIC-CXR formatting: terse, focused, professional. You MUST NOT: Invent new findings or reword unsupported conclusions. Add clinical context not present in the visual or evidence inputs. You MAY: Improve phrasing for clarity or brevity. Remove footnote tags in your final output. Output ONLY the final cleaned report. Keep section headers intact"
+  expected_output: "A cleaned two-part radiology report with FINDINGS and IMPRESSION sections. Do NOT include source tags. Do NOT include any commentary or explanation — only the final report"
+  agent: critic_agent

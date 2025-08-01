@@ -1,0 +1,13 @@
+
+crewai
+gradio>=4.27
+faiss-cpu
+groq
+google-genai
+transformers
+torch
+numpy
+pillow
+open-clip-torch
+pydantic
+tqdm

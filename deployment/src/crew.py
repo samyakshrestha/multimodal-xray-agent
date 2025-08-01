@@ -13,8 +13,10 @@ class RadiologyCrew:
         # Initialize LLMs with optimal settings
         self.vision_llm = LLM(model="groq/meta-llama/llama-4-scout-17b-16e-instruct", temperature=0.2)
         self.text_llm = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.1)
+        self.text_llm2 = LLM(model="groq/llama3-70b-8192", temperature=0.1)
+        self.text_llm3 = LLM(model="groq/meta-llama/llama-4-maverick-17b-128e-instruct", temperature=0.1)
         self.draft_llm = LLM(model="groq/deepseek-r1-distill-llama-70b", temperature=0.3)
-        self.critic_llm = LLM(model="groq/meta-llama/llama-4-scout-17b-16e-instruct", temperature=0.2)
+        self.critic_llm = LLM(model="groq/meta-llama/llama-4-scout-17b-16e-instruct", temperature=0.3)
 
     @agent
     def vision_agent(self) -> Agent:
@@ -31,7 +33,7 @@ class RadiologyCrew:
         return Agent(
             config=self.agents_config['pubmed_agent'],
             tools=[self.tools["pubmed_tool"]],
-            llm=self.text_llm,
+            llm=self.text_llm2,
             verbose=False
         )
 
@@ -40,7 +42,7 @@ class RadiologyCrew:
         return Agent(
             config=self.agents_config['iu_agent'],
             tools=[self.tools["iu_tool"]],
-            llm=self.text_llm,
+            llm=self.text_llm3,
             verbose=False
         )
 

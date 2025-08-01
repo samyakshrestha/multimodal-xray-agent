@@ -1,4 +1,3 @@
-
 crewai
 gradio>=4.27
 faiss-cpu
